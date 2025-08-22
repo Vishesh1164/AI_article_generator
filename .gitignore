@@ -2,3 +2,4 @@
 node_modules/
 p1.py
 p2.py
+.gitignore
