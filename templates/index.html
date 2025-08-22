@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/css/output.css" rel="stylesheet">
+
+    <title>AI Content Generator</title>
+</head>
+<body class="bg-black text-white"></body>
+<nav class="bg-gradient-to-r from-black via-gray-800 to-black shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <span class="text-white font-extrabold text-2xl tracking-wide drop-shadow-lg">AI Content Generator</span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-center space-x-6">
+                    <a href="#" class="transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Home</a>
+                    <a href="#" class="transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Features</a>
+                    <a href="#" class="transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Pricing</a>
+                    <a href="#" class="transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Contact</a>
+                </div>
+            </div>
+            <div class="md:hidden">
+                <button id="navbar-toggle" class="text-white hover:bg-gray-900 hover:text-blue-400 p-2 rounded-lg focus:outline-none transition-colors duration-200">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="navbar-menu" class="md:hidden hidden px-2 pt-2 pb-3 space-y-2 bg-gradient-to-b from-black via-gray-800 to-black rounded-b-lg shadow-lg">
+        <a href="#" class="block transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Home</a>
+        <a href="#" class="block transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Features</a>
+        <a href="#" class="block transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Pricing</a>
+        <a href="#" class="block transition-colors duration-200 text-white hover:bg-gray-900 hover:text-blue-400 px-4 py-2 rounded-lg text-base font-semibold shadow-sm">Contact</a>
+    </div>
+</nav>
+
+<div class="max-w-xl mx-auto mt-12 p-4 sm:p-8 bg-gray-900 rounded-lg shadow-lg">
+    <form id="promptForm" class="space-y-6">
+        <div>
+            <label for="promptInput" class="block text-gray-300 font-semibold mb-2">Enter your prompt:</label>
+            <input type="text" id="promptInput" name="prompt" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-700 rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2 rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 transition-colors duration-200">
+            Generate
+        </button>
+        <div>
+            <label for="outputField" class="block text-gray-300 font-semibold mb-2">Output:</label>
+            <textarea id="outputField" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-700 rounded-lg bg-gray-800 text-white resize-none min-h-[40px] overflow-hidden" readonly></textarea>
+        </div>
+    </form>
+</div>
+<script>
+    // Auto-resize textarea
+    const outputField = document.getElementById('outputField');
+    function autoResize() {
+        outputField.style.height = 'auto';
+        outputField.style.height = outputField.scrollHeight + 'px';
+    }
+    outputField.addEventListener('input', autoResize);
+
+    function populateOutputField(data) {
+        outputField.value = 'Loading...';
+        autoResize();
+        document.getElementById('promptInput').value = '';
+        let res = fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: data })
+        });
+        res.then(response => response.json())
+            .then(data => {
+                outputField.value = data.result;
+                autoResize();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+
+<script>
+    const toggle = document.getElementById('navbar-toggle');
+    const menu = document.getElementById('navbar-menu');
+    toggle.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+    });
+
+    document.getElementById('promptForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const prompt = document.getElementById('promptInput').value;
+        populateOutputField(prompt);
+    });
+
+
+</script>
+</body>
+</html>
